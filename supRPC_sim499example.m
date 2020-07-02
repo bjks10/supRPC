@@ -1,16 +1,13 @@
 bb = 499
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%SUPERVISED ROBUST PROFILE CLUSTERING   
+%SUPERVISED ROBUST PROFILE CLUSTERING prior  
 %Programmer: Briana Stephenson
-%Data: Simulated Dataset B499 
-% pi: global profile membership weight
-% lambda: local profile membership weight
-% theta0: global profile pattern distribution
-% theta1: local profile pattern distribution
-% nu: global allocation probability parameter
-% beta: nu hyperparameter
-% trueG: true allocation variable (1=global/0=local)
-% subpop_samp: subpopulation identifier index
+%Data: NBDPS 
+% Remove DP and replace with OFM global/local
+% Decrease concentration parameter to encourage sparsity
+% adjust beta to simulate a t
+% mu0~std normal, sig0 ~ IG(5/2,5/2)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 sim_n=bb;
 
@@ -654,13 +651,14 @@ DIC=-4*median(loglikesrpc_thin)+2*sum(loglike_srpcmed)
 nu_mse=immse(nu_med,trueG);
 save(strcat('py_simResults',num2str(sim_n)),'py_pred','pred_ci','pred_nu','DIC','DIC_star','t_I0','y_mse','nu_mse');
 
-clf  
-    %plot comparing predicted to true nu
-subplot(1,2,1);
-heatmap(transpose(pred_nu));
-title('Derived Local Deviations');
-
-subplot(1,2,2);
-heatmap(transpose(trueG));
-title('True Local Deviations');
-saveas(gcf,strcat('G_deviations499.png'))
+%     clf  
+%     %plot comparing predicted to true nu
+% subplot(1,2,1);
+% heatmap(transpose(nu_med));
+% title('Derived Local Deviations');
+% 
+% subplot(1,2,2);
+% heatmap(transpose(trueG));
+% title('True Local Deviations');
+% saveas(gcf,strcat('G_deviations.png'))
+% 
