@@ -10,7 +10,7 @@ The code and supporting materials are run using MATLAB software. To run the exam
 supRPC_sim499example.m - run supervised RPC and create output data
 drchrnd.m - Dirichlet random generator function
 truncnormrnd.m - function file to generate draw from truncated normal random distribution
-sim_sRPCdataB499.mat - input simulated data source
+sim_sRPCdata499.mat - input simulated data source
 
 
 The example dataset is a MAT-file that contains the following variables:
