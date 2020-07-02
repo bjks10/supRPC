@@ -1,19 +1,19 @@
-
+bb = 499
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%TRADITIONAL LCA (4-classes)  
+%TRADITIONAL LCA (6-classes)  
 %Programmer: Briana Stephenson
-%Data: Simulated Dataset B499 
+%Data: NBDPS 
 %Parameters estimated: 
 % pi (cluster membership)
 % theta (cluster multinomial density)
+% save output for import to R for label switch postprocess
+%EDIT -- Remove Croissants, fruit punch, veg/soy burger, soy milk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-bb=499; %simulated data index
 sim_n=bb;
 
 %% load NBDPS data %%
-load(strcat('sim_sRPCdataB',num2str(sim_n),'.mat'))
-% load('sim_sRPCtest3')
+load(strcat('sim_sRPCdata',num2str(sim_n),'.mat'))
 
 food=sampledata;
 
@@ -165,10 +165,10 @@ end
 % Wup=[w_sid x_ci(:,2:end)]; %covariate matrix with state/global
 Wup=[w_sid x_ci];
   %add cluster L to referent group
-% pcov=size(Wup,2);
+pcov=size(Wup,2);
 %create latent z_probit
     %create truncated normal for latent z_probit model
-    WXi_now=Wup*transpose(xi_iter);
+    WXi_now=Wup*transpose(xi_iter(1:pcov));
 %truncation for cases (0,inf)
 z_probit(y_cc==1)=truncnormrnd(1,WXi_now(y_cc==1),1,0,inf);
 %truncation for controls (-inf,0)
@@ -185,18 +185,33 @@ z_probit(y_cc==0)=truncnormrnd(1,WXi_now(y_cc==0),1,-inf,0);
 
 % Response Xi(B) update
 
-    xi_s_up1=inv(Sig0)+(transpose(Wup)*Wup);
-    xi_mu1=(Sig0\transpose(xi_0))+(transpose(Wup)*z_probit); %%%%
-    xi_mu_up=xi_s_up1\xi_mu1;
-    xi_iter=mvnrnd(xi_mu_up,inv(xi_s_up1));
-    xi_out(iter,:)=xi_iter;
-    wxi=Wup*transpose(xi_iter);
+sig0up=Sig0(1:pcov,1:pcov);
+xi_0up=xi_0(1:pcov);
 
-phiWXilca=normcdf(Wup*transpose(xi_iter));
-    phiWXilca(phiWXilca==0)=1e-10;
-    phiWXilca(phiWXilca==1)=1-1e-10;
-loglikei=y_cc.*log(phiWXilca) + (1-y_cc).*log(1-phiWXilca);
+xi_sig_up=inv(sig0up)+(transpose(Wup)*Wup);
+xi_mu_up2=(sig0up*transpose(xi_0up))+(transpose(Wup)*z_probit);
+xi_mu_up=xi_sig_up\xi_mu_up2;
+xi_up=mvnrnd(xi_mu_up,inv(xi_sig_up));
+xi_iter(1:length(xi_up))=xi_up;
+xi_out(iter,:)=xi_iter;
+
+% phiWXilca=normcdf(Wup*transpose(xi_up));
+% phiWXilca(phiWXilca==0)=1e-10;
+%    phiWXilca(phiWXilca==1)=1-1e-10;
+% loglikei=y_cc.*log(phiWXilca) + (1-y_cc).*log(1-phiWXilca);
 loglik_lca(iter)=sum(log_lca);
+
+
+for k=1:K
+   w_ip=zeros(n,K);
+   w_ip(:,k)=ones(n,1);
+   W_temp=[w_sid w_ip];
+   phi_temp=normcdf(W_temp*transpose(xi_iter));
+        phi_temp(phi_temp==1)=1-1e-10;
+        phi_temp(phi_temp==0)=1e-10;
+   lprobit_kp=y_cc.*log(phi_temp)+(1-y_cc).*log(1-phi_temp);
+   ep_kp(:,k)=exp(lprobit_kp);
+end
 
 %% RELABELLING STEP TO ENCOURAGE MIXING %%
 
@@ -223,7 +238,7 @@ loglik_lcaburn=loglik_lca(burn+1:end);
 xiburn=xi_out(burn+1:end,:);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
 
-% save(strcat('NBDPS_BLCAout',num2str(K)),'piburn','thetaburn','ciburn','Loglike0_burn','loglik_lcaburn','xiburn');
+save(strcat('simBLCAout',num2str(K)),'piburn','thetaburn','ciburn','loglik_lcaburn','xiburn');
 
 
 m_perm=size(thetaburn,1);
@@ -281,6 +296,8 @@ for k=1:kia
    w_ip(:,k)=ones(n,1);
    W_temp=[w_sid w_ip];
    phi_temp=normcdf(W_temp*transpose(xi_med));
+        phi_temp(phi_temp==0)=1e-10;
+        phi_temp(phi_temp==1)=1-1e-10;
    probit_kp=y_cc.*log(phi_temp)+(1-y_cc).*log(1-phi_temp);
    ep_kpl(:,k)=exp(probit_kp);
 end
@@ -292,7 +309,7 @@ delmean=zeros(n,kia);
          delmean(:,h) = pi_med(h) * prod(tmpmat0,2).*ep_kpl(:,h);
     end 
     zup0 = bsxfun(@times,delmean,1./(sum(delmean,2)));
-    loglca_med=log(sum(delmean,2));
+    loglca_mean=log(sum(delmean,2));
     med_ci=mnrnd(1,zup0); [r, c]=find(med_ci); w_gc=[r c];
     w_gc=sortrows(w_gc,1); pred_ci=w_gc(:,2);
 
@@ -301,18 +318,18 @@ delmean=zeros(n,kia);
       %add cluster 1 to referent group
 WXi_med=Wmed*transpose(xi_med);     
 
-phiWXimed=normcdf(WXi_med);
+phiWXimean=normcdf(WXi_med);
 % - pull extremes off the bounds - %
-phiWXimed(phiWXimed==0)=1e-10;
-   phiWXimed(phiWXimed==1)=1-1e-10;
- py_pred=phiWXimed; 
+phiWXimean(phiWXimean==0)=1e-10;
+   phiWXimean(phiWXimean==1)=1-1e-10;
+ py_pred=phiWXimean;
 y_mse=immse(py_pred,phi_WXtrue)
 
+    loglike_mean=y_cc.*log(phiWXimean) + (1-y_cc).*log(1-phiWXimean);
     %DIC based only on probit model
-       dic_star=-6*median(loglik_lcaburn)+4*sum(loglca_med)
-       dic_reg=-4*median(loglik_lcaburn)+2*sum(loglca_med)
+       dic_dem=-4*median(loglik_lcaburn)+2*sum(loglca_mean);
     
 
-save(strcat('simLCAprobitResults',num2str(sim_n)),'theta0_med','pi_med','pred_ci','xi_ci','t_I0','y_mse','dic_star','dic_reg');
+ save(strcat('simLCAprobitResults',num2str(sim_n)),'theta0_med','pi_med','pred_ci','xi_ci','t_I0','y_mse','dic_dem');
 
  
