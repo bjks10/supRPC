@@ -20,16 +20,16 @@ When the number of clusters, globally and locally, is known a priori the adaptiv
 # Simulated Examples
 The example dataset found in the Simulation folder is a MAT-file that contains the following variables:
 
-sampledata: 4800x50 matrix. This matrix is the input dataset containing subject level data for 50 variables. Each variable assigned a single categorical value (1,2,3,4).
-trueG: binary 4x50 matrix. This matrix is used as a reference to illustrate the true probability of allocation for each variable within each subpopulation to global (ν= 1) or local (ν= 0).
-subpop_samp: 4800x1 vector. This vector contains subpopulation ID for the 4800 subjects included in the dataset.
-true_global: 50x3 matrix. This matrix contains the 3 global profile patterns modally expected. 
-true_ci: 4800x1 matrix. This matrix contains the true global profile assignment to each subject.
-true_local: 8x50 matrix. This matrix contains the two local profile patterns modally expected for each subpopulation. Rows 1-2 correspond to subpopulation 1. Rows 3-4 correspond to subpopulation 2. Rows 5-6 correspond to subpopulation 3. Rows 7-8 correspond to subpopulation 4.  
-true_Li: 4800x1 matrix. This matrix contains the local profile assignment to each subject.
-true_xi: 1x7 vector. This row vector contains the true coefficients of the probit regression model
-true_y: 4800x1 vector. This column vector contains the true binary outcome for each subject: 1=case, 0=control.
-phi_WXtrue: 4800x1 vector. This column vector contains the true probability of outcome for each subject.
+* sampledata: 4800x50 matrix. This matrix is the input dataset containing subject level data for 50 variables. Each variable assigned a single categorical value (1,2,3,4).
+* trueG: binary 4x50 matrix. This matrix is used as a reference to illustrate the true probability of allocation for each variable within each subpopulation to global (ν= 1) or local (ν= 0).
+* subpop_samp: 4800x1 vector. This vector contains subpopulation ID for the 4800 subjects included in the dataset.
+* true_global: 50x3 matrix. This matrix contains the 3 global profile patterns modally expected. 
+* true_ci: 4800x1 matrix. This matrix contains the true global profile assignment to each subject.
+* true_local: 8x50 matrix. This matrix contains the two local profile patterns modally expected for each subpopulation. Rows 1-2 correspond to subpopulation 1. Rows 3-4 correspond to subpopulation 2. Rows 5-6 correspond to subpopulation 3. Rows 7-8 correspond to subpopulation 4.  
+* true_Li: 4800x1 matrix. This matrix contains the local profile assignment to each subject.
+* true_xi: 1x7 vector. This row vector contains the true coefficients of the probit regression model
+* true_y: 4800x1 vector. This column vector contains the true binary outcome for each subject: 1=case, 0=control.
+* phi_WXtrue: 4800x1 vector. This column vector contains the true probability of outcome for each subject.
 
 Two cases are demonstrated in the Simulation folder:
 1. Case 1: Simulated population with no subpopulation-specific confounding present
