@@ -15,7 +15,7 @@ bb
 sim_n=bb;
 
 %% load NBDPS data %%
-load(strcat('CaseE_sRPCdata',num2str(sim_n),'.mat'))
+load(strcat('CaseD_sRPCdata',num2str(sim_n),'.mat'))
 % load('sim_sRPCtest3')
 
 food=sampledata;
@@ -329,6 +329,6 @@ y_mse=immse(py_pred,phi_WXtrue)
        dic_reg=-4*median(loglik_lcaburn)+2*sum(loglca_med)
     
 
-save(strcat('simLCAprobitResults_E',num2str(bb)),'theta0_med','pi_med','pred_ci','xi_ci','t_I0','y_mse','dic_star','dic_reg');
+save(strcat('simLCAprobitResults_D',num2str(bb)),'theta0_med','pi_med','pred_ci','xi_ci','t_I0','y_mse','dic_star','dic_reg');
 
  
