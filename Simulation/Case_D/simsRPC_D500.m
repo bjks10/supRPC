@@ -12,7 +12,7 @@ bb
 sim_n=bb;
 
 %% load NBDPS data %%
- load(strcat('CaseE_sRPCdata',num2str(sim_n),'.mat'))
+ load(strcat('CaseD_sRPCdata',num2str(sim_n),'.mat'))
 % load('sim_sRPCtest3')
 food=sampledata;
 
@@ -989,7 +989,7 @@ loglike_srpcmed=tij_logglobrpcmed+loglike_locsrpcmed;
 DIC_star=-6*mean(loglikesrpc_thin)+4*sum(loglike_srpcmed);
 DIC=-4*median(loglikesrpc_thin)+2*sum(loglike_srpcmed);
 nu_mse=immse(pred_nu,trueG);
-save(strcat('py_simResults_E',num2str(sim_n)),'py_pred','pred_ci','pred_nu','DIC','DIC_star','t_I0','y_mse','nu_mse','xi_mse','py_mse');
+save(strcat('py_simResults_D',num2str(sim_n)),'py_pred','pred_ci','pred_nu','DIC','DIC_star','t_I0','y_mse','nu_mse','xi_mse','py_mse');
 
     clf  
     %plot comparing predicted to true nu
